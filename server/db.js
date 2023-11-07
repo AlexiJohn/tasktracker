@@ -36,10 +36,10 @@ db.connect((err) => {
   
         console.log('Using "tasksalexis" database.');
         
+        // user_id INT AUTO_INCREMENT PRIMARY KEY,
         db.query(`
             CREATE TABLE IF NOT EXISTS users (
-              user_id INT AUTO_INCREMENT PRIMARY KEY,
-              username VARCHAR(255) NOT NULL,
+              username VARCHAR(255) PRIMARY KEY,
               password VARCHAR(60) NOT NULL
           );`, (err, results) => {
           if (err) {
@@ -56,8 +56,8 @@ db.connect((err) => {
             Name VARCHAR(255) NOT NULL,
             Description TEXT,
             Status TINYINT(1) DEFAULT 0,
-            user_id INT, -- Add user_id column
-            FOREIGN KEY (user_id) REFERENCES users(user_id) -- Define the foreign key constraint
+            username VARCHAR(255),
+            FOREIGN KEY (username) REFERENCES users(username)
           );`, (err, results) => {
           if (err) {
             console.error('Error creating table: ' + err);

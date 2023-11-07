@@ -14,6 +14,7 @@ function TaskManager() {
 
   const dispatch = useDispatch();
   const { tasks, newTask, editingTaskId, editedTaskText, editedTask } = useSelector((state) => state.tasks);
+  const username = useSelector((state) => state.auth.username);
 
   useEffect(() => {
 
@@ -32,6 +33,7 @@ function TaskManager() {
     axios.get('http://localhost:8000/items')
       .then((response) => {
         dispatch(setTasks(response.data));
+        console.log(tasks)
       })
       .catch((error) => {
         console.error('Error fetching tasks:', error);
@@ -39,12 +41,11 @@ function TaskManager() {
   }
 
   const addTask = () => {
-
     if (newTask.Name == "" || newTask.Description == ""){
       alert("Please input valid data");
     } else {
       // Create a new task using the Express API
-      axios.post('http://localhost:8000/items', newTask)
+      axios.post('http://localhost:8000/items', {Name: newTask.Name, Description: newTask.Description, username: username})
       .then((response) => {
         dispatch(setNewTask({...newTask, Name: "", Description:  ""}));
         refreshTask();
@@ -55,26 +56,36 @@ function TaskManager() {
     }
   };
 
-  const deleteTask = (taskId) => {
-    // Delete a task using the Express API
-    axios.delete(`http://localhost:8000/items/${taskId}`)
-      .then(() => {
-        const updatedTasks = tasks.filter((task) => task.id !== taskId);
-        refreshTask();
-      })
-      .catch((error) => {
-        console.error('Error deleting a task:', error);
-      });
+  const deleteTask = (taskEdit) => {
+
+    if(taskEdit.username !== username){
+      alert("WRONG USER")
+    } else {
+        // Delete a task using the Express API
+        axios.delete(`http://localhost:8000/items/${taskEdit.ID}`)
+        .then(() => {
+          const updatedTasks = tasks.filter((task) => task.id !== taskEdit.ID);
+          refreshTask();
+        })
+        .catch((error) => {
+          console.error('Error deleting a task:', error);
+        });
+    }
+    
   };
 
-  const editTask = (taskId, editingTask) => {
+  const editTask = (task) => {
     // Set the task ID and text for editing
     
-    dispatch(setEditingTaskId(taskId));
-    const filteredTask = tasks.filter(function (el) {
-      return el.ID == taskId;
-    })
-    dispatch(setEditedTask({ ...editedTask, Name: filteredTask[0].Name, Description:  filteredTask[0].Description}));
+    if(task.username !== username){
+      alert("WRONG USER")
+    } else {
+      dispatch(setEditingTaskId(task.ID));
+      const filteredTask = tasks.filter(function (el) {
+      return el.ID == task.ID;
+      })
+      dispatch(setEditedTask({ ...editedTask, Name: filteredTask[0].Name, Description:  filteredTask[0].Description}));
+    }
 
   };
 
@@ -126,50 +137,66 @@ function TaskManager() {
     </button>
     <ul>
     {tasks.map((task) => (
-          <li key={task.ID}>
-            {editingTaskId === task.ID ? (
-              <>
-                <div>
-                    <input 
-                      type="text"
-                      id="editedTaskName"
-                      name="editedTaskName"
-                      placeholder={editedTask.Name}
-                      value={editedTask.Name}
-                      onChange= {(e) => (
-                        dispatch(setEditedTask({ ...editedTask, Name: e.target.value }))
-                        )} 
-                    />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    id="editedTaskDescription"
-                    name="editedTaskDescription"
-                    placeholder={editedTask.Description}
-                    value={editedTask.Description}
-                    onChange={(e) => dispatch(setEditedTask({ ...editedTask, Description: e.target.value }))}
-                  />
-                </div>
-                
-                
-                <button onClick={saveEditedTask}>Save</button>
-                <button onClick={cancelEditing}>Cancel</button>
-              </>
-            ) : (
-              <>
-                <div>
-                  <strong>Name:</strong> {task.Name}
-                </div>
-                <div>
-                  <strong>Description:</strong> {task.Description}
-                </div>
-                <button onClick={() => editTask(task.ID, task.Name)}>Edit</button>
-                <button onClick={() => deleteTask(task.ID)}>Delete</button>
-              </>
-            )}
-          </li>
-        ))}
+      <div key={task.ID} className="card" style={{ width: '18rem' }}>
+        <div className="card-body">
+          {editingTaskId === task.ID ? (
+            <>
+              <div className="form-group">
+                <input 
+                  type="text"
+                  className="form-control"
+                  id="editedTaskName"
+                  name="editedTaskName"
+                  placeholder={editedTask.Name}
+                  value={editedTask.Name}
+                  onChange= {(e) => (
+                    dispatch(setEditedTask({ ...editedTask, Name: e.target.value }))
+                    )} 
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="editedTaskDescription"
+                  name="editedTaskDescription"
+                  placeholder={editedTask.Description}
+                  value={editedTask.Description}
+                  onChange={(e) => dispatch(setEditedTask({ ...editedTask, Description: e.target.value }))}
+                />
+              </div>
+              
+              <button className="btn btn-primary" onClick={saveEditedTask}>Save</button>
+              <button className="btn btn-secondary" onClick={cancelEditing}>Cancel</button>
+            </>
+          ) : (
+            <>
+              
+              <p className="card-text">{task.Description}</p>
+              <h5 className="card-title">{task.Name}</h5>
+              {
+                task.username == username ? (
+                  <>
+                    <button className="btn btn-primary" onClick={() => editTask(task)}>Edit</button>
+                    <button className="btn btn-danger" onClick={() => deleteTask(task)}>Delete</button>
+                    <div className="card-img-top d-flex justify-content-center align-items-center" style={{ backgroundColor: '#007bff', color: 'white', borderRadius: '50%', width: '100px', height: '100px', position: 'absolute', bottom: '10px', right: '10px', fontSize: '30px', fontWeight: 'bold' }}>
+                      {task.username.slice(0, 2).toUpperCase()}
+                    </div>
+                  </>
+                  
+                ) : (<>
+                    <div className="card-img-top d-flex justify-content-center align-items-center" style={{ backgroundColor: '#007bff', color: 'white', borderRadius: '50%', width: '100px', height: '100px', position: 'absolute', bottom: '10px', right: '10px', fontSize: '30px', fontWeight: 'bold' }}>
+                      {task.username.slice(0, 2).toUpperCase()}
+                    </div>
+                </>)
+              }
+              
+            </>
+          )}
+        </div>
+        
+      </div>
+))}
     </ul>
   </div> 
   );
