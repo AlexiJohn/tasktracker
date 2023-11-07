@@ -2,6 +2,8 @@
 
 ## Installation
 
+1. Git clone from the repository
+
 ### Server Setup
 
 1. Open the Command Line in the `TASKTRACKER` directory.
