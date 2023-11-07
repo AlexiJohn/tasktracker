@@ -13,9 +13,10 @@ cd server
 ```
 
 3. Edit the `.envExample` file to configure the necessary variables for your hosts. Rename the .envExample to .env after editing.
-4. Start the server by running:
+4. Start the server by running the following lines:
 
-``` 
+```
+npm install
 npm start 
 ```
 ### Client Setup
@@ -27,8 +28,9 @@ npm start
 cd client
 ```
 3. Edit the `.env` file to configure the necessary variables for your hosts.
-4. Start the client application by running:
+4. Start the client application by running the following lines:
 ```
+npm install
 npm start
 ```
 
