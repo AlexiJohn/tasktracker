@@ -136,8 +136,14 @@ function TaskManager() {
       Add Task
     </button>
     <ul>
+    <div>
+      <div className='row'>
+
+      </div>
+    </div>
     {tasks.map((task) => (
-      <div key={task.ID} className="card" style={{ width: '18rem' }}>
+      <div key={task.ID} className="col-md-6 col-lg-4 mb-4">
+        <div className='card h-100'>
         <div className="card-body">
           {editingTaskId === task.ID ? (
             <>
@@ -171,29 +177,32 @@ function TaskManager() {
             </>
           ) : (
             <>
-              
-              <p className="card-text">{task.Description}</p>
-              <h5 className="card-title">{task.Name}</h5>
+              <blockquote className='blockquote mb-20'>
+                <p className="card-text">{task.Description}</p>
+              </blockquote>
+              <footer className='blockquote-footer'>
+                <strong>{task.Name}</strong>
+                <div className="card-img-top d-flex justify-content-center align-items-center" style={{ backgroundColor: '#007bff', color: 'white', borderRadius: '50%', width: '100px', height: '100px', position: 'absolute', bottom: '10px', right: '10px', fontSize: '30px', fontWeight: 'bold' }}>
+                      {task.username.slice(0, 2).toUpperCase()}
+                    </div>
+              </footer>
               {
                 task.username == username ? (
                   <>
                     <button className="btn btn-primary" onClick={() => editTask(task)}>Edit</button>
                     <button className="btn btn-danger" onClick={() => deleteTask(task)}>Delete</button>
-                    <div className="card-img-top d-flex justify-content-center align-items-center" style={{ backgroundColor: '#007bff', color: 'white', borderRadius: '50%', width: '100px', height: '100px', position: 'absolute', bottom: '10px', right: '10px', fontSize: '30px', fontWeight: 'bold' }}>
-                      {task.username.slice(0, 2).toUpperCase()}
-                    </div>
                   </>
                   
                 ) : (<>
-                    <div className="card-img-top d-flex justify-content-center align-items-center" style={{ backgroundColor: '#007bff', color: 'white', borderRadius: '50%', width: '100px', height: '100px', position: 'absolute', bottom: '10px', right: '10px', fontSize: '30px', fontWeight: 'bold' }}>
-                      {task.username.slice(0, 2).toUpperCase()}
-                    </div>
+                    
                 </>)
               }
               
             </>
           )}
         </div>
+        </div>
+        
         
       </div>
 ))}
